@@ -25,7 +25,7 @@ Ask the user which region to order from. Only two regions are supported:
 | Region | Base URL | Currency |
 |--------|----------|----------|
 | **SG** (Singapore) | `https://repo-wheat-theta-43.vercel.app` | SGD |
-| **HK** (Hong Kong) | `https://repo-6riuigdr0-umiiiis-projects.vercel.app` | HKD |
+| **HK** (Hong Kong) | `https://foodhk.vercel.app` | HKD |
 
 Set `BASE_URL` accordingly for all subsequent API calls.
 
