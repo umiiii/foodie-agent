@@ -47,7 +47,7 @@ export default async function RestaurantPage({
 
       {menu.length === 0 && (
         <p className="text-gray-400 py-8 text-center">
-          Menu not available. Set FOODPANDA_SESSION_TOKEN to fetch full menus.
+          Menu not available for this restaurant.
         </p>
       )}
 

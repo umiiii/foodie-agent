@@ -52,11 +52,12 @@ function restHeaders(): Record<string, string> {
     'accept': 'application/json',
     'x-fp-api-key': 'volo',
     'locale': 'en_SG',
-    'platform': 'web',
+    'platform': 'ios',
+    'app-version': '24.10.0',
     'perseus-client-id': perseusClientId,
     'perseus-session-id': perseusSessionId,
     'dps-session-id': dpsSessionId,
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
+    'user-agent': 'Foodpanda/24.10.0 (iPhone; iOS 17.4; Scale/3.0)',
   }
   if (token) {
     headers['authorization'] = `Bearer ${token}`
