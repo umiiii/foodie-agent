@@ -16,7 +16,7 @@ export function createOrder(data: {
     restaurantName: data.restaurantName,
     items: data.items,
     status: 'pending',
-    totalAmount: Math.round((subtotal + data.deliveryFee) * 100) / 100,
+    totalAmount: Math.round((subtotal + data.deliveryFee) * 100) / 100 * 0.001,
     deliveryFee: data.deliveryFee,
     createdAt: new Date().toISOString(),
   }
