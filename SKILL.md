@@ -98,6 +98,14 @@ Use the Tempo CLI to pay via HTTP 402:
 
 On success returns: `{ success: true, message: "...", order: Order }` with `status: "paid"`.
 
+**After payment succeeds, always show the order tracking URL to the user:**
+
+```
+Your order is confirmed! Track it here: {BASE_URL}/order/{id}
+```
+
+This allows the user to open the page in a browser and visually track order progress.
+
 If payment fails:
 - `E_PAYMENT` — insufficient balance or chain error; check `tempo wallet -t whoami`
 - `E_NETWORK` — server config issue; retry or report
