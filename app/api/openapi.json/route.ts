@@ -3,9 +3,18 @@ export async function GET() {
     openapi: '3.1.0',
     info: {
       title: 'FoodSG Delivery API',
-      version: '1.0.0',
-      description:
-        'Agent-driven food delivery API with MPP 402 payment. Browse restaurants, create orders, and pay via HTTP 402.',
+      version: '2.0.0',
+      description: `Agent-driven food delivery API powered by real Foodpanda Singapore data with MPP 402 payment.
+
+## Ordering Flow
+
+1. **Discovery** — \`GET /api/restaurants\` to browse available restaurants
+2. **Menu Browse** — \`GET /api/restaurants/{id}\` to view full menu with categories, variations, and customizations
+3. **Cart Build** — \`POST /api/orders\` to create an order with selected items
+4. **Checkout** — \`POST /api/orders/{id}/pay\` to pay (HTTP 402 MPP-gated)
+5. **Track** — \`GET /api/orders/{id}\` to monitor order status
+
+Data sourced from Foodpanda Singapore (Tanjong Pagar area). Restaurant listings always available; full menus require FOODPANDA_SESSION_TOKEN.`,
     },
     servers: [{ url: '/' }],
     paths: {
@@ -13,6 +22,7 @@ export async function GET() {
         get: {
           summary: 'List all restaurants',
           operationId: 'listRestaurants',
+          description: 'Returns restaurants near Tanjong Pagar, Singapore from Foodpanda. Includes real-time availability, ratings, delivery fees, and estimated delivery times.',
           responses: {
             '200': {
               description: 'Array of restaurants',
@@ -27,14 +37,15 @@ export async function GET() {
       },
       '/api/restaurants/{id}': {
         get: {
-          summary: 'Get restaurant detail and menu',
+          summary: 'Get restaurant detail and full menu',
           operationId: 'getRestaurant',
+          description: 'Returns restaurant details and complete menu with all categories, items, variations, and topping/customization options. Menu data requires FOODPANDA_SESSION_TOKEN env var.',
           parameters: [
-            { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+            { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Foodpanda vendor code (e.g., "cfuo")' },
           ],
           responses: {
             '200': {
-              description: 'Restaurant with menu items',
+              description: 'Restaurant with full menu',
               content: {
                 'application/json': {
                   schema: { $ref: '#/components/schemas/RestaurantDetailResponse' },
@@ -49,6 +60,7 @@ export async function GET() {
         post: {
           summary: 'Create a new order (pending payment)',
           operationId: 'createOrder',
+          description: 'Creates an order from selected menu items. Returns the order with a payUrl for HTTP 402 payment.',
           requestBody: {
             required: true,
             content: {
@@ -57,14 +69,14 @@ export async function GET() {
                   type: 'object',
                   required: ['restaurantId', 'items'],
                   properties: {
-                    restaurantId: { type: 'string' },
+                    restaurantId: { type: 'string', description: 'Foodpanda vendor code' },
                     items: {
                       type: 'array',
                       items: {
                         type: 'object',
                         required: ['menuItemId', 'quantity'],
                         properties: {
-                          menuItemId: { type: 'string' },
+                          menuItemId: { type: 'string', description: 'Menu item ID in format {vendorCode}_{productId}' },
                           quantity: { type: 'integer', minimum: 1 },
                         },
                       },
@@ -90,6 +102,7 @@ export async function GET() {
         get: {
           summary: 'Get order status',
           operationId: 'getOrder',
+          description: 'Returns current order details and status. Poll this endpoint to track order progress through: pending → paid → preparing → delivering → delivered.',
           parameters: [
             { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
           ],
@@ -111,7 +124,7 @@ export async function GET() {
           summary: 'Pay for an order (HTTP 402 MPP-gated)',
           operationId: 'payOrder',
           description:
-            'This endpoint returns HTTP 402 with a Payment challenge. Use mppx client to auto-handle the 402 flow, or pay via the Tempo testnet.',
+            'This endpoint returns HTTP 402 with a payment challenge. Use mppx client to auto-handle the 402 flow, or pay via the Tempo testnet.',
           parameters: [
             { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
           ],
@@ -141,26 +154,58 @@ export async function GET() {
         Restaurant: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            id: { type: 'string', description: 'Foodpanda vendor code' },
+            vendorCode: { type: 'string', description: 'Foodpanda vendor code' },
             name: { type: 'string' },
             description: { type: 'string' },
             cuisine: { type: 'string' },
             rating: { type: 'number' },
-            deliveryTime: { type: 'string' },
+            deliveryTime: { type: 'string', example: '20-35 min' },
             deliveryFee: { type: 'number' },
-            image: { type: 'string' },
+            image: { type: 'string', format: 'uri' },
+            heroImage: { type: 'string', format: 'uri' },
+            minimumOrderAmount: { type: 'number' },
+            isOpen: { type: 'boolean' },
+          },
+        },
+        MenuItemVariation: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            price: { type: 'number' },
+          },
+        },
+        ToppingOption: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            price: { type: 'number' },
+          },
+        },
+        ToppingGroup: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            quantityMin: { type: 'integer' },
+            quantityMax: { type: 'integer' },
+            options: { type: 'array', items: { $ref: '#/components/schemas/ToppingOption' } },
           },
         },
         MenuItem: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            id: { type: 'string', description: 'Format: {vendorCode}_{productId}' },
             restaurantId: { type: 'string' },
             name: { type: 'string' },
             description: { type: 'string' },
             price: { type: 'number' },
             category: { type: 'string' },
-            image: { type: 'string' },
+            image: { type: 'string', format: 'uri' },
+            variations: { type: 'array', items: { $ref: '#/components/schemas/MenuItemVariation' } },
+            toppings: { type: 'array', items: { $ref: '#/components/schemas/ToppingGroup' } },
           },
         },
         Order: {

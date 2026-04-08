@@ -5,10 +5,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const restaurant = getRestaurant(id)
+  const restaurant = await getRestaurant(id)
   if (!restaurant) {
     return Response.json({ error: 'Restaurant not found' }, { status: 404 })
   }
-  const menu = getMenuItems(id)
+  const menu = await getMenuItems(id)
   return Response.json({ restaurant, menu })
 }

@@ -7,6 +7,30 @@ export interface Restaurant {
   deliveryTime: string
   deliveryFee: number
   image: string
+  vendorCode: string
+  heroImage: string
+  minimumOrderAmount: number
+  isOpen: boolean
+}
+
+export interface MenuItemVariation {
+  id: string
+  name: string
+  price: number
+}
+
+export interface ToppingOption {
+  id: string
+  name: string
+  price: number
+}
+
+export interface ToppingGroup {
+  id: string
+  name: string
+  quantityMin: number
+  quantityMax: number
+  options: ToppingOption[]
 }
 
 export interface MenuItem {
@@ -17,6 +41,8 @@ export interface MenuItem {
   price: number
   category: string
   image: string
+  variations?: MenuItemVariation[]
+  toppings?: ToppingGroup[]
 }
 
 export type OrderStatus =

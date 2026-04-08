@@ -1,8 +1,10 @@
 import { getAllRestaurants } from '@/lib/mock-data'
 import RestaurantCard from '@/components/RestaurantCard'
 
-export default function HomePage() {
-  const restaurants = getAllRestaurants()
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage() {
+  const restaurants = await getAllRestaurants()
 
   return (
     <>

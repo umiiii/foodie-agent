@@ -15,14 +15,14 @@ export async function POST(request: Request) {
     )
   }
 
-  const restaurant = getRestaurant(restaurantId)
+  const restaurant = await getRestaurant(restaurantId)
   if (!restaurant) {
     return Response.json({ error: 'Restaurant not found' }, { status: 404 })
   }
 
   const orderItems = []
   for (const item of items) {
-    const menuItem = getMenuItem(item.menuItemId)
+    const menuItem = await getMenuItem(item.menuItemId)
     if (!menuItem) {
       return Response.json(
         { error: `Menu item ${item.menuItemId} not found` },
