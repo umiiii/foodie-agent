@@ -1,13 +1,14 @@
 import type { Restaurant, MenuItem, ToppingGroup } from './types'
 import { cacheGet, cacheSet } from './cache'
+import { config } from './config'
 
-const GRAPHQL_URL = 'https://sg.fd-api.com/graphql'
-const REST_BASE = 'https://sg.fd-api.com'
+const GRAPHQL_URL = `${config.apiBase}/graphql`
+const REST_BASE = config.apiBase
 
 const VENDOR_LIST_HASH = 'eecccb80814fbd2449f3fb1317985de351781b373cb7d322c294e50725d3df2d'
 
-const LATITUDE = 1.2794418
-const LONGITUDE = 103.8545553
+const LATITUDE = config.latitude
+const LONGITUDE = config.longitude
 
 // Generate stable session IDs for the server lifetime
 const perseusClientId = `${Date.now()}.${Math.random().toString().slice(2, 20)}.${Math.random().toString(36).slice(2, 12)}`
@@ -37,7 +38,7 @@ function graphqlHeaders(): Record<string, string> {
     'customer-longitude': String(LONGITUDE),
     'display-context': 'rlp',
     'dps-session-id': dpsSessionId,
-    'locale': 'en_SG',
+    'locale': config.locale,
     'perseus-client-id': perseusClientId,
     'perseus-session-id': perseusSessionId,
     'platform': 'web',
@@ -51,7 +52,7 @@ function restHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     'accept': 'application/json',
     'x-fp-api-key': 'volo',
-    'locale': 'en_SG',
+    'locale': config.locale,
     'platform': 'ios',
     'app-version': '24.10.0',
     'perseus-client-id': perseusClientId,
@@ -140,7 +141,7 @@ export async function fetchRestaurants(): Promise<Restaurant[]> {
       input: {
         expeditionType: 'DELIVERY',
         latitude: LATITUDE,
-        locale: 'en_SG',
+        locale: config.locale,
         longitude: LONGITUDE,
         customerType: 'B2C',
         featureFlags: [
@@ -150,7 +151,7 @@ export async function fetchRestaurants(): Promise<Restaurant[]> {
           { name: 'vdp_citadel-tech-integration', value: 'Control' },
           { name: 'pd-mp-slp-replatform-federated', value: 'Variation1' },
         ],
-        languageId: 1,
+        languageId: config.languageId,
         page: 'RESTAURANT_LANDING_PAGE',
         vendorFilters: {
           budgets: [],
@@ -374,7 +375,7 @@ export async function fetchRestaurantDetail(
   }
 
   try {
-    const url = `${REST_BASE}/api/v5/vendors/${encodeURIComponent(vendorCode)}?include=menus,bundles,multiple_discounts&latitude=${LATITUDE}&longitude=${LONGITUDE}&language_id=1&dynamic_pricing=0`
+    const url = `${REST_BASE}/api/v5/vendors/${encodeURIComponent(vendorCode)}?include=menus,bundles,multiple_discounts&latitude=${LATITUDE}&longitude=${LONGITUDE}&language_id=${config.languageId}&dynamic_pricing=0`
 
     const res = await fetch(url, { headers: restHeaders() })
 

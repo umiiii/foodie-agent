@@ -10,7 +10,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="text-lg font-bold text-orange-600">
-          FoodSG
+          {process.env.NEXT_PUBLIC_REGION === 'hk' ? 'FoodHK' : 'FoodSG'}
         </Link>
         <Link
           href="/cart"

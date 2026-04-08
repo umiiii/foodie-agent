@@ -3,8 +3,10 @@ import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import Navbar from '@/components/Navbar'
 
+const isHK = process.env.NEXT_PUBLIC_REGION === 'hk'
+
 export const metadata: Metadata = {
-  title: 'FoodSG - Agent-Driven Food Delivery',
+  title: isHK ? 'FoodHK - Agent-Driven Food Delivery' : 'FoodSG - Agent-Driven Food Delivery',
   description: 'Order food from local restaurants, powered by real Foodpanda data and MPP 402 payments.',
 }
 
